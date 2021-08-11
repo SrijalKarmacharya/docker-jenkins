@@ -2,7 +2,7 @@ pipeline {
   agent any
   
   environment { 
-        registry = "srijaldocker/pipe" 
+        registry = "srijaldocker/pipe1" 
         registryCredential = 'dockerhub_id'
         dockerImage = ''
     }
@@ -22,34 +22,17 @@ pipeline {
             }
         }
        
-       stage('Building image') {
-            steps{
-                script {
-                    dockerImage = docker.build registry
-                }
-            }
-        }
-        
-        stage('Push Image') {
+      stage('Build & Push Image') {
             steps{
                 script {
                     docker.withRegistry( '', registryCredential ) {
+                        dockerImage = docker.build registry
                         dockerImage.push("$BUILD_NUMBER")
                         dockerImage.push('latest')
                     }
                 }
             }
         }
-        
-         // Running Docker container, make sure port 8096 is opened in 
-        stage('Docker Run') {
-            steps{
-              script {
-                 dockerImage.run("-p 8088:3000 --rm --name myNodeContainer2")
-              }
-            }
-        }
-
         
         
        
